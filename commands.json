@@ -1,0 +1,26 @@
+{
+    "Commands": {
+        "1": {
+            "name": "$MRS",
+            "desc": "Displays the most recent survey regarding the german elections."
+        },
+        "2": {
+            "name": "$MSG",
+            "desc": "Displays a message on my screen. (PAUSED)"
+        },
+        "3": {
+            "name": "$OHN",
+            "desc": "Shows all Websites from my friends :>"
+        },
+        "4": {
+            "name": "$Invite",
+            "desc": "Reveals the link to invite the Bot to other Servers!"
+        }
+    },
+    "Developer": {
+        "1": {
+            "name": "Flörian",
+            "job": "Did literally everything (thats why everything sucks :>)"
+        }
+    }
+}
