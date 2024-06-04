@@ -15,6 +15,14 @@
         "4": {
             "name": "$Invite",
             "desc": "Reveals the link to invite the Bot to other Servers!"
+        },
+        "5": {
+            "name": "$Femboy",
+            "desc": "Reveals on a scale from 0-100% how much someone is a femboy!"
+        },
+        "6": {
+            "name": "$Ship",
+            "desc": "Shows how much someone is in love with someone else!"
         }
     },
     "Developer": {

@@ -1,0 +1,8 @@
+
+17\30\16 - check() missing 1 required positional argument: 'client'
+17\32\17 - name 'send_mrs_in_channel' is not defined
+17\46\45 - send_mrs_in_channel() missing 2 required positional arguments: 'channel' and 'guild'
+18\14\18 - 'int' object has no attribute 'send'
+18\52\39 - 'Member' object has no attribute 'append'
+18\54\10 - 'int' object has no attribute 'mention'
+19\05\24 - Cannot choose from an empty sequence

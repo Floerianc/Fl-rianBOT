@@ -2,6 +2,20 @@ import requests
 
 DAWUM_API_URL = 'https://api.dawum.de/'
 
+def check():
+    rsp = requests.get(DAWUM_API_URL) # Sends a request to the API_URL
+    data = rsp.json() # Converts it into a JSON
+    
+    keys = list(data["Surveys"].keys())
+    with open("mrs_key.key", "r") as key_file:
+        key = key_file.read()
+        if key == keys[0]:
+            exit()
+        else:
+            with open("mrs_key.key", "w") as key_file:
+                key_file.write(f"{keys[0]}")
+            get_current_json()
+
 def get_current_json():
     global data
     rsp = requests.get(DAWUM_API_URL) # Sends a request to the API_URL

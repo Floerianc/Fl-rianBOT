@@ -1,11 +1,11 @@
 # bot.py
-import os, discord, json, time
+import os, discord, json, time, datetime, colorama, random
 from dotenv import load_dotenv
 from threading import Thread
 
 from func.dawum_mrs.get_msg_content import *
 from func.xmsg.xmsgbox import *
-from func.error.catch import *
+import func.error.catch as error
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -13,13 +13,26 @@ INVITE = os.getenv('DISCORD_INVITE')
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 client = discord.Client(intents=intents)
+
+
+def check_online(client):
+    while True:
+        currentDateAndTime = datetime.datetime.now()
+        currentTime = currentDateAndTime.strftime("%H\\%M\\%S")
+        print(colorama.Fore.LIGHTGREEN_EX + f"{client} IS STILL ONLINE " + colorama.Fore.BLACK + colorama.Back.WHITE + f"{currentTime}" + colorama.Style.RESET_ALL)
+        time.sleep(300)
+
+
 
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
-    checking_thread = Thread(target=check, args=(client.user,))
+    checking_thread = Thread(target=check_online, args=(client.user,))
     checking_thread.start()
+
+
 
 @client.event
 async def on_message(message):
@@ -52,12 +65,11 @@ async def on_message(message):
             ohn_websites = ["mat.", "nightwolf.", "flo.", "dnascanner.de"]
 
             msg_content = f""
+            msg_content += f"### 1: [DNAScanner's Website](https://www.dnascanner.de)\n"
             for i in range(len(ohn_websites)-1):
-                msg_content += f"\n### {i+1}: [{ohn_association[i]}'s Website](https://www.{ohn_websites[i]}ohhellnaw.de)"
+                msg_content += f"\n### {i+2}: [{ohn_association[i]}'s Website](https://{ohn_websites[i]}ohhellnaw.de)"
                 if ohn_association[i] == "Flörian":
                     msg_content += f" *(The creator of this bot hehe :>)*\n"
-            
-            msg_content += f"### {len(ohn_websites)}: [DNAScanner's Website](https://www.dnascanner.de)\n"
 
             embed = discord.Embed(title="All OhHellNaw Websites", description=msg_content, color=255)
             await message.channel.send(embed=embed)
@@ -80,9 +92,24 @@ async def on_message(message):
         elif message.content.startswith('$Invite'):
                 embed = discord.Embed(title="Invite", description=f"Use this invite link to invite the Bot to other servers!\n[Click here!]({INVITE})", color=255)
                 await message.channel.send(embed=embed)
-    
+
+        elif message.content.startswith('$Femboy'):
+            humans = []
+            async for member in message.guild.fetch_members():
+                humans.append(member)
+            user = random.choice(humans)
+            await message.channel.send(f"{user.mention} is {random.randint(0,100)}% femboy.")
+        
+        elif message.content.startswith('$Ship'):
+            humans = []
+            async for member in message.guild.fetch_members():
+                humans.append(member)
+            await message.channel.send(f"{(random.choice(humans)).mention} is {random.randint(0,100)}% in love with {(random.choice(humans)).mention}! <3")
+
     except Exception as ex:
-        catch_error(ex)
+        error.catch_error(ex)
+
+
 
 @client.event
 async def on_guild_join(guild):
