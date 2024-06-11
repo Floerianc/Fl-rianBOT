@@ -23,6 +23,10 @@
         "6": {
             "name": "$Ship",
             "desc": "Shows how much someone is in love with someone else!"
+        },
+        "7": {
+            "name": "$Messages",
+            "desc": "Reveals how many messages I have read so far :)"
         }
     },
     "Developer": {

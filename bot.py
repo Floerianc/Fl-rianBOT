@@ -1,7 +1,8 @@
-# bot.py
 import os, discord, json, time, datetime, colorama, random
 from dotenv import load_dotenv
 from threading import Thread
+from discord.ext import commands
+from discord import app_commands
 
 from func.dawum_mrs.get_msg_content import *
 from func.xmsg.xmsgbox import *
@@ -11,10 +12,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 INVITE = os.getenv('DISCORD_INVITE')
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-client = discord.Client(intents=intents)
+client = commands.Bot(intents=discord.Intents.all(), command_prefix="/")
+total_messages_read = 0
 
 
 def check_online(client):
@@ -27,88 +26,102 @@ def check_online(client):
 
 
 @client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    def total_messages():
+        global total_messages_read
+        total_messages_read = total_messages_read + 1
+    
+    total_messages()
+
+
+
+@client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
     checking_thread = Thread(target=check_online, args=(client.user,))
     checking_thread.start()
 
-
-
-@client.event
-async def on_message(message):
     try:
-        if message.author == client.user:
-            return
-        
-        if message.content.startswith('$MRS'):
-            get_current_json()
-            with open("cache/message.bot", "r", encoding="UTF-8") as msg:
-                msg_content = msg.read()
-            
-            embed = discord.Embed(title="NEUSTE WAHLERGEBNISSE", description=msg_content, color=255)
-            await message.channel.send(embed=embed)
+        synced = await client.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        error.catch_error(e)
 
-            file_path = "cache\\message.bot"
-            os.remove(file_path)
-        
 
-        elif message.content.startswith('$MSG'):
-            user_msg = message.content.replace("$MSG", " ")
-            write_vbs(user_msg)
-            time.sleep(1)
-
-            file_path = "cache\\msg_from_user.vbs"
-            os.remove(file_path)
-        
-        elif message.content.startswith('$OHN'):
-            ohn_association = ["Matxilla", "Nightwolf", "Flörian", "DNAScanner"]
-            ohn_websites = ["mat.", "nightwolf.", "flo.", "dnascanner.de"]
-
-            msg_content = f""
-            msg_content += f"### 1: [DNAScanner's Website](https://www.dnascanner.de)\n"
-            for i in range(len(ohn_websites)-1):
-                msg_content += f"\n### {i+2}: [{ohn_association[i]}'s Website](https://{ohn_websites[i]}ohhellnaw.de)"
-                if ohn_association[i] == "Flörian":
-                    msg_content += f" *(The creator of this bot hehe :>)*\n"
-
-            embed = discord.Embed(title="All OhHellNaw Websites", description=msg_content, color=255)
-            await message.channel.send(embed=embed)
-        
-        elif message.content.startswith('$Help'):
-            with open("commands.json", encoding="UTF-8") as file:
-                commands = json.load(file)
-            msg_content = f""
-        
-            for i in range(len(commands["Commands"])):
-                msg_content += f'**{commands["Commands"][f"{i+1}"]["name"]}** *{commands["Commands"][f"{i+1}"]["desc"]}*\n'
-            msg_content += "\n### Developers\n"
-            
-            for j in range(len(commands["Developer"])):
-                msg_content += f'**{commands["Developer"][f"{j+1}"]["name"]}** - *{commands["Developer"][f"{j+1}"]["job"]}*'
-            
-            embed = discord.Embed(title="Help", description=msg_content, color=255)
-            await message.channel.send(embed=embed)
+@client.hybrid_command(description="Displays the results of the most recent political surveys in Germany.")
+async def mrs(ctx: commands.Context):
+    get_current_json()
+    with open("cache/message.bot", "r", encoding="UTF-8") as msg:
+        msg_content = msg.read()
     
-        elif message.content.startswith('$Invite'):
-                embed = discord.Embed(title="Invite", description=f"Use this invite link to invite the Bot to other servers!\n[Click here!]({INVITE})", color=255)
-                await message.channel.send(embed=embed)
+    embed = discord.Embed(title="NEUSTE WAHLERGEBNISSE", description=msg_content, color=255)
+    await ctx.send(embed=embed)
 
-        elif message.content.startswith('$Femboy'):
-            humans = []
-            async for member in message.guild.fetch_members():
-                humans.append(member)
-            user = random.choice(humans)
-            await message.channel.send(f"{user.mention} is {random.randint(0,100)}% femboy.")
-        
-        elif message.content.startswith('$Ship'):
-            humans = []
-            async for member in message.guild.fetch_members():
-                humans.append(member)
-            await message.channel.send(f"{(random.choice(humans)).mention} is {random.randint(0,100)}% in love with {(random.choice(humans)).mention}! <3")
+    try:
+        file_path = "cache\\message.bot"
+        os.remove(file_path)
+    except Exception as e:
+        error.catch_error(e)
 
-    except Exception as ex:
-        error.catch_error(ex)
 
+@client.hybrid_command(description="Displays a message directly on my Screen")
+@app_commands.describe(message="What do you want the message to say?")
+async def msg(ctx: commands.Context, message: str):
+    user_msg = f"{message}"
+    try:
+        write_vbs(user_msg)
+        time.sleep(1)
+
+        file_path = "cache\\msg_from_user.vbs"
+        os.remove(file_path)
+        await ctx.send("Message was sent!")
+    except Exception as e:
+        await ctx.send("Message couldn't be delivered :(")
+        error.catch_error(e)
+
+@client.hybrid_command(description="Shows all of the websites from the OHN-Staff!")
+async def ohn(ctx: commands.Context):
+    ohn_association = ["DNA", "Flörian", "Fabix", "Nightwolf", "Matxilla"]
+    ohn_websites = ["www.dnascanner.de", "flo.ohhellnaw.de", "bagelxd.de", "nightwolf.ohhellnaw.de", "mat.ohhellnaw.de"]
+
+    msg_content = f""
+    for i in range(len(ohn_websites)):
+        msg_content += f"\n### {i+1}: [{ohn_association[i]}'s Website](https://{ohn_websites[i]})"
+        if ohn_association[i] == "Flörian":
+            msg_content += f" *(The creator of this bot hehe :>)*\n"
+
+    embed = discord.Embed(title="All OhHellNaw Websites", description=msg_content, color=255)
+    await ctx.send(embed=embed)
+
+@client.hybrid_command(description="A invite link to invite this bot into other Servers aswell!")
+async def invite(ctx: commands.Context):
+    embed = discord.Embed(title="Invite", description=f"Use this invite link to invite the Bot to other servers!\n[Click here!]({INVITE})", color=255)
+    await ctx.send(embed=embed)
+
+
+@client.hybrid_command(description="Tells you if a person is a femboy")
+@app_commands.describe(person="Which person do you want to choose?")
+async def femboy(ctx: commands.Context, person: discord.Member):
+    try:
+        await ctx.send(f"{person.mention} is {random.randint(0,100)}% femboy.", silent=True)
+    except Exception as e:
+        error.catch_error(e)
+
+@client.hybrid_command(description="Ships two people")
+@app_commands.describe(person="Select the first person", person2="Select the second person")
+async def ship(ctx: commands.Context, person: discord.Member, person2: discord.Member):
+    try:
+        await ctx.send(f"{person.mention} is {random.randint(0,100)}% in love with {person2.mention}! <3", silent=True)
+    except Exception as e:
+        error.catch_error(e)
+
+
+@client.hybrid_command(description="Reveals how many messages the Bot has read so far...")
+async def messages(ctx: commands.Context):
+    await ctx.send(f"I've read {total_messages_read:,} messages since the last time I have restarted!")
 
 
 @client.event
