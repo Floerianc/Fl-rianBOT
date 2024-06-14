@@ -5,26 +5,22 @@
             "desc": "Displays the most recent survey regarding the german elections."
         },
         "2": {
-            "name": "$MSG",
-            "desc": "Displays a message on my screen. (PAUSED)"
-        },
-        "3": {
             "name": "$OHN",
             "desc": "Shows all Websites from my friends :>"
         },
-        "4": {
+        "3": {
             "name": "$Invite",
             "desc": "Reveals the link to invite the Bot to other Servers!"
         },
-        "5": {
+        "4": {
             "name": "$Femboy",
             "desc": "Reveals on a scale from 0-100% how much someone is a femboy!"
         },
-        "6": {
+        "5": {
             "name": "$Ship",
             "desc": "Shows how much someone is in love with someone else!"
         },
-        "7": {
+        "6": {
             "name": "$Messages",
             "desc": "Reveals how many messages I have read so far :)"
         }
