@@ -150,11 +150,9 @@ async def meme(ctx: commands.Context):
     user and bot will not be interrupted.
     """
     asyncio.sleep(5)
-    filename = memeapi()
-    with open(filename, "r", encoding="UTF-8") as f:
-        content = f.read()
+    meme = memeapi()
     
-    await ctx.send(f"{content}")
+    await ctx.send(f"{meme}")
 
 
 

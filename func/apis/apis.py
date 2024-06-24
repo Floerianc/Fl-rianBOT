@@ -25,9 +25,7 @@ def memeapi():
     rsp = requests.get(MEME_URL)
     data = rsp.json()
     meme = data["url"]
-    filename = f"cache/meme_{day}{month}{hour}{minute}{second}"
-    write_temp(filename, meme)
-    return filename
+    return meme
 
 def write_temp(name, content):
     with open(name, "w", encoding="UTF-8") as f:
