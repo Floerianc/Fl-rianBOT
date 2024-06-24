@@ -3,19 +3,16 @@ import requests
 DAWUM_API_URL = 'https://api.dawum.de/'
 
 def get_current_json():
-    global data
     rsp = requests.get(DAWUM_API_URL) # Sends a request to the API_URL
     data = rsp.json() # Converts it into a JSON
-    most_recent_survey()
+    return data
 
-def most_recent_survey():
-    global MRS
+def most_recent_survey(data):
     keys = list(data["Surveys"].keys())
     MRS = data["Surveys"][f"{keys[0]}"] # MRS (Most Recent Survey) is now the first key in the Surveys Section
-    get_values(MRS)
+    return MRS
 
-def get_values(MRS):
-    global date, surveyed_people, parliament_name, institute_name, abbreviations, percentages, parties, parliament_ID, institute_ID
+def get_values(MRS, data):
     date = MRS["Date"] # Gets date of first Survey
     surveyed_people = MRS["Surveyed_Persons"] # How many people contributed
     results = MRS["Results"] # Results of all Parties who were there
@@ -32,17 +29,17 @@ def get_values(MRS):
         abbreviations.append(data["Parties"][f"{key}"]["Shortcut"]) # AfD, CDU/CSU...
         percentages.append(results[f"{key}"]) # 30%, 17%...
     
-    full_message()
+    return date, surveyed_people, parliament_name, institute_name, abbreviations, percentages, parties, parliament_ID, institute_ID
 
 
-def full_message():
-    def get_url():
+def full_message(data, date, surveyed_people, parliament_name, institute_name, abbreviations, percentages, parties, parliament_ID, institute_ID):
+    def get_url(data):
         # https://dawum.de/Europawahl/Forschungsgruppe_Wahlen/2024-05-30/
         parliament_url = data["Parliaments"][f"{parliament_ID}"]["Election"]
         institute_url = institute_name.replace(" ", "_")
-        global mrs_url
         mrs_url = f"https://dawum.de/{parliament_url}/{institute_url}/{date}"
-    get_url()
+        return mrs_url
+    mrs_url = get_url(data)
 
     results = ""
     content = f"Parlament: **{parliament_name}**\nInstitut: **{institute_name}**\nDatum: **{date}**\nAnzahl befragte Personen: **{surveyed_people}**\n# __Ergebnisse__\n"
@@ -57,6 +54,4 @@ def full_message():
     results += f"\n\nUm die Ergebnisse nochmal auf der offiziellen DAWUM-Website einzusehen, klicken Sie [hier.]({mrs_url})"
 
     content = content + results # combines date, surveyed people, parliament, institute and the results into one big string
-    with open("cache/message.bot", "w", encoding="UTF-8") as msg:
-        msg.write(content)
-        return
+    return content

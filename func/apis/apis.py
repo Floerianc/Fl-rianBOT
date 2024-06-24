@@ -16,9 +16,7 @@ def witzede():
     rsp = requests.get(WITZ_URL)
     data = rsp.json()
     joke = data[0]["text"]
-    filename = f"cache/witzede_{day}{month}{hour}{minute}{second}.bot"
-    write_temp(filename, joke)
-    return filename
+    return joke
 
 def memeapi():
     day, month, hour, minute, second = update_time()

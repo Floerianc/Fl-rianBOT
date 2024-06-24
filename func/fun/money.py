@@ -1,18 +1,35 @@
-import random, pickledb
+import random
 class User:
     def __init__(self, name, money) -> None:
         self.name = name
         self.money = money
+
+def casino(option, user):
+    if option == "poor":
+        profit = 500; cost = -75; chance = 15
+    elif option == "normie":
+        profit = 1500; cost = -120; chance = 10
+    elif option == "rich":
+        profit = 5000; cost = -450; chance = 5
+    
+    num = random.randint(0,100)
+    if num <= chance:
+        money_change = profit
+        content = f"{user} Won in the Casino! {user} has won {profit}€!"
+    else:
+        money_change = cost
+        content = f"{user} did not win in the Casino, losing {cost}€."
+    return content, money_change
 
 
 def steal_from_user(user, rdm_user):
     num = random.randint(1,100)
     if num < 61:
         money_change = random.randint(80,240)
-        msg_content = f"{user.mention} successfully stole **{money_change}€** from {rdm_user.mention}!"
+        msg_content = f"{user.mention} successfully stole **{money_change}€** from {rdm_user}!"
     else:
         money_change = random.randint(-90,-30)
-        msg_content = f"{user.mention} couldn't steal any money from {rdm_user.mention}, losing {money_change}€ instead."
+        msg_content = f"{user.mention} couldn't steal any money from {rdm_user}, losing {money_change}€ instead."
     return msg_content, money_change
 
 def break_into_house(user):
