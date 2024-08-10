@@ -5,4 +5,5 @@ New Commands:
 - Upgrade Account (you're less likely to be robbed :D)
 - Roulette
 - A ((very) polite) chatbot!
+
 oh and small improvements in performance lol
