@@ -10,7 +10,6 @@ def update_time():
     return day, month, hour, minute, second
 
 def witzede():
-    day, month, hour, minute, second = update_time()
     WITZ_URL = "https://witzapi.de/api/joke/?limit=1&language=de"
 
     rsp = requests.get(WITZ_URL)
@@ -19,7 +18,6 @@ def witzede():
     return joke
 
 def memeapi():
-    day, month, hour, minute, second = update_time()
     MEME_URL = "https://meme-api.com/gimme"
 
     rsp = requests.get(MEME_URL)
